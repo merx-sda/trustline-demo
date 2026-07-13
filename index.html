@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Jordan Reyes — Trustline Home Services</title>
+<style>
+  :root{
+    --navy:#101b2d;
+    --page:#0a1420;
+    --cream:#f3ead9;
+    --cream-muted:#cfc6b3;
+    --muted:#8a8371;
+    --gold:#caa768;
+    --green:#8fd19e;
+    --amber:#d98c4a;
+    --border:rgba(243,234,217,0.12);
+    --border-soft:rgba(243,234,217,0.08);
+    --surface:rgba(243,234,217,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--page);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  .wrap{max-width:430px;margin:0 auto;min-height:100vh;background:var(--navy);color:var(--cream);position:relative;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:0.5px solid var(--border);}
+  .brand{font-size:12px;letter-spacing:0.03em;color:var(--gold);}
+  .topbar-icons{display:flex;align-items:center;gap:10px;}
+  .icon-btn{width:30px;height:30px;border-radius:50%;background:rgba(202,167,104,0.15);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--gold);font-size:14px;}
+  .demo-trigger{width:8px;height:8px;border-radius:50%;background:transparent;border:none;cursor:pointer;padding:6px;opacity:0.35;}
+  .toggle-row{display:flex;gap:6px;padding:10px 16px;border-bottom:0.5px solid var(--border);}
+  .toggle-btn{flex:1;background:var(--surface);border:0.5px solid var(--border);border-radius:6px;padding:6px;font-size:11px;color:var(--muted);cursor:pointer;}
+  .toggle-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:600;}
+  .header{display:flex;align-items:center;gap:12px;padding:16px;}
+  .avatar{width:48px;height:48px;border-radius:50%;background:var(--gold);color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:16px;flex-shrink:0;}
+  .name{font-family:Georgia,Cambria,"Times New Roman",serif;font-size:17px;}
+  .title{font-size:12px;color:var(--cream-muted);margin-top:2px;}
+  .section{padding:0 16px 14px;}
+  .section-label{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;}
+  .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+  .badge{background:var(--surface);border:0.5px solid var(--border);border-radius:8px;padding:8px 4px;font-size:10.5px;text-align:center;color:var(--cream);cursor:pointer;}
+  .badge-detail{margin-top:8px;font-size:12px;color:var(--cream-muted);line-height:1.5;min-height:32px;}
+  .step{padding:8px 0;border-bottom:0.5px solid var(--border-soft);cursor:pointer;}
+  .step:last-child{border-bottom:none;}
+  .step-row{display:flex;align-items:center;justify-content:space-between;}
+  .step-name{font-size:13px;display:flex;align-items:center;gap:8px;}
+  .status-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .status-done{background:var(--green);}
+  .status-progress{background:var(--gold);}
+  .status-todo{background:var(--muted);}
+  .status-waiting{background:var(--amber);}
+  .status-text{font-size:10.5px;}
+  .step-detail{margin-top:8px;font-size:12px;color:var(--cream-muted);line-height:1.5;display:none;}
+  .step.open .step-detail{display:block;}
+  .stars{display:flex;gap:3px;margin:8px 0 6px;}
+  .star{font-size:15px;color:rgba(243,234,217,0.25);cursor:pointer;}
+  .star.filled{color:var(--gold);}
+  textarea.comment{width:100%;background:rgba(243,234,217,0.05);border:0.5px solid var(--border);border-radius:6px;color:var(--cream);font-size:11px;padding:8px;resize:none;height:44px;font-family:inherit;}
+  .mark-done-btn{width:100%;margin-top:8px;}
+  .reschedule-note{font-size:11px;color:var(--cream-muted);line-height:1.4;margin-top:10px;}
+  .reschedule-btn{width:100%;margin-top:8px;}
+  .reschedule-form{margin-top:8px;}
+  .reschedule-form input{width:100%;box-sizing:border-box;background:rgba(243,234,217,0.05);border:0.5px solid rgba(243,234,217,0.2);border-radius:6px;color:var(--cream);font-size:12px;padding:8px;margin-bottom:6px;font-family:inherit;}
+  .reschedule-submit{width:100%;}
+  .reschedule-confirm{font-size:11px;color:var(--cream-muted);margin-top:8px;line-height:1.4;}
+  .privacy-note{font-size:9.5px;color:var(--muted);margin-top:4px;}
+  .membership-card{border:0.5px solid rgba(202,167,104,0.4);border-radius:10px;padding:12px;margin:0 16px 14px;}
+  .membership-title{font-size:13px;color:var(--gold);}
+  .membership-sub{font-size:11px;color:var(--cream-muted);margin:4px 0 10px;line-height:1.4;}
+  .btn-gold{width:100%;background:var(--gold);color:var(--navy);border:none;border-radius:6px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;}
+  .btn-outline{background:transparent;color:var(--cream);border:0.5px solid rgba(243,234,217,0.25);border-radius:6px;padding:9px;font-size:11px;cursor:pointer;}
+  .edu-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .edu-card{background:var(--surface);border:0.5px solid var(--border-soft);border-radius:8px;padding:10px;font-size:11px;cursor:pointer;}
+  .edu-play{color:var(--gold);font-size:13px;margin-bottom:4px;}
+  .close-stub{width:100%;background:transparent;color:var(--muted);border:0.5px dashed rgba(243,234,217,0.25);border-radius:6px;padding:10px;font-size:11px;}
+  .headline{font-family:Georgia,Cambria,"Times New Roman",serif;font-size:16px;line-height:1.4;padding:0 16px 14px;}
+  .gift-box{border:0.5px solid rgba(202,167,104,0.4);border-radius:10px;padding:12px;margin:0 16px 14px;}
+  .gift-box input{width:100%;box-sizing:border-box;background:rgba(243,234,217,0.05);border:0.5px solid rgba(243,234,217,0.2);border-radius:6px;color:var(--cream);font-size:12px;padding:9px;margin-bottom:8px;font-family:inherit;}
+  .deal-row{background:var(--surface);border-radius:8px;padding:9px 12px;font-size:12px;display:flex;justify-content:space-between;margin-bottom:6px;}
+  .footer-row{display:flex;gap:8px;padding:0 16px 20px;}
+  .footer-row .btn-outline{flex:1;}
+  .flash{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--gold);color:var(--navy);font-size:11px;font-weight:600;padding:8px 14px;border-radius:20px;opacity:0;transition:opacity 0.25s, transform 0.25s;pointer-events:none;white-space:nowrap;}
+  .flash.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <span class="brand">Trustline Home Services</span>
+    <div class="topbar-icons">
+      <button class="demo-trigger" id="demoTrigger" aria-label="internal"></button>
+      <button class="icon-btn" aria-label="Text the tech" onclick="event.preventDefault();">&#9993;</button>
+    </div>
+  </div>
+
+  <div class="toggle-row">
+    <button class="toggle-btn active" id="btnStateA">Active visit (demo)</button>
+    <button class="toggle-btn" id="btnStateB">No active visit (demo)</button>
+  </div>
+
+  <div id="stateA">
+    <div class="header">
+      <div class="avatar">JR</div>
+      <div>
+        <div class="name">Jordan Reyes</div>
+        <div class="title">Senior field technician · 11 yrs</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="badges" id="badges"></div>
+      <div class="badge-detail" id="badgeDetail">Full background check completed. License #TRL-4471, insured.</div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Today's agenda</div>
+      <div id="steps"></div>
+    </div>
+
+    <div class="membership-card">
+      <div class="membership-title">Trustline Advantage membership</div>
+      <div class="membership-sub">20% off today's repair · priority scheduling · annual checkup · $29/mo</div>
+      <button class="btn-gold" id="joinBtn">Join</button>
+    </div>
+
+    <div class="section">
+      <div class="section-label">While I'm working, check these out</div>
+      <div class="edu-grid" id="eduGrid"></div>
+    </div>
+
+    <div class="section">
+      <button class="close-stub" disabled>Close job — designed in workflow phase</button>
+    </div>
+  </div>
+
+  <div id="stateB" style="display:none;">
+    <div class="header">
+      <div class="avatar">JR</div>
+      <div>
+        <div class="name">Jordan Reyes</div>
+        <div class="title">Your technician on file</div>
+      </div>
+    </div>
+
+    <div class="headline">No visit scheduled right now, but here's something for you anyway.</div>
+
+    <div class="gift-box" id="giftBox">
+      <div id="giftPrompt">
+        <div style="font-size:12px;color:var(--cream-muted);margin-bottom:10px;">Claim a welcome gift, on us.</div>
+        <button class="btn-gold" id="giftBtn">Claim your welcome gift</button>
+      </div>
+      <div id="giftForm" style="display:none;">
+        <input type="text" placeholder="Your name" id="giftName">
+        <input type="text" placeholder="Phone or email" id="giftContact">
+        <button class="btn-gold" id="giftSubmit">Send my gift</button>
+      </div>
+      <div id="giftConfirm" style="display:none;font-size:12px;color:var(--cream-muted);line-height:1.5;">
+        Sent. Check your text or email for code <span id="giftCode" style="color:var(--gold);"></span>.
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Current deals</div>
+      <div class="deal-row"><span>Seasonal tune-up</span><span style="color:var(--gold);">$79</span></div>
+      <div class="deal-row"><span>0% financing, 12 months</span><span></span></div>
+      <div class="deal-row"><span>Trustline Advantage</span><span style="color:var(--gold);">20% off · $29/mo</span></div>
+    </div>
+
+    <div class="footer-row">
+      <button class="btn-outline" id="saveContactBtn">Save contact</button>
+      <button class="btn-outline" onclick="event.preventDefault();">Text Jordan</button>
+    </div>
+  </div>
+
+  <div class="flash" id="flash"></div>
+</div>
+
+<script>
+  var EVENTS_KEY = 'tl_events';
+  var ALERTS_KEY = 'tl_alerts';
+  var RESCHEDULE_KEY = 'tl_reschedules';
+  var TECH_NAME = 'Jordan Reyes';
+
+  var FORMSPREE_FORM_ID = 'xbdnjegd';
+
+  function logReschedule(payload){
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem(RESCHEDULE_KEY) || '[]'); } catch(e){ list = []; }
+    list.push(payload);
+    localStorage.setItem(RESCHEDULE_KEY, JSON.stringify(list));
+  }
+
+  function sendRescheduleEmail(payload){
+    fetch('https://formspree.io/f/' + FORMSPREE_FORM_ID, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify({
+        subject: 'Reschedule reported — ' + payload.tech,
+        tech: payload.tech,
+        step: payload.step,
+        new_appointment_date: payload.newDate,
+        message: payload.tech + ' reported a customer-confirmed new appointment date of ' + payload.newDate + ' during the "' + payload.step + '" step. Please confirm this matches what was actually booked with the technician.'
+      })
+    }).catch(function(err){ console.log('Reschedule email failed to send (check form ID):', err); });
+  }
+
+  function readAlerts(){
+    try { return JSON.parse(localStorage.getItem(ALERTS_KEY) || '{}'); } catch(e){ return {}; }
+  }
+  function writeAlerts(obj){
+    localStorage.setItem(ALERTS_KEY, JSON.stringify(obj));
+  }
+
+  function dispatch(type, label, points){
+    var events = [];
+    try { events = JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]'); } catch(e){ events = []; }
+    events.push({ id: Date.now() + '-' + Math.random().toString(36).slice(2), tech: TECH_NAME, type: type, label: label, points: points, ts: Date.now() });
+    if (events.length > 150) events = events.slice(-150);
+    localStorage.setItem(EVENTS_KEY, JSON.stringify(events));
+    if (points > 0) showFlash('+' + points + ' pts → Game Board');
+  }
+
+  function showFlash(text){
+    var el = document.getElementById('flash');
+    el.textContent = text;
+    el.classList.add('show');
+    clearTimeout(window._flashTimer);
+    window._flashTimer = setTimeout(function(){ el.classList.remove('show'); }, 1600);
+  }
+
+  var badgeData = [
+    { label:'Background checked', detail:'Full background check completed. License #TRL-4471, insured.' },
+    { label:'1,240 jobs', detail:'1,240 jobs completed. Ask to see recent work in your neighborhood.' },
+    { label:'4.9 rating', detail:'4.9 out of 5 stars across 312 verified reviews.' },
+    { label:'Diagnostics pro', detail:'Diagnostics specialist, trained to find the root cause, not just the symptom.' },
+    { label:'Top seller', detail:'Top membership seller three quarters running.' },
+    { label:'Why I do this', detail:'“I like fixing what’s broken and leaving people better off than I found them. Every home gets my full attention, no shortcuts.”' }
+  ];
+  var badgesEl = document.getElementById('badges');
+  badgeData.forEach(function(b){
+    var btn = document.createElement('button');
+    btn.className = 'badge';
+    btn.textContent = b.label;
+    btn.addEventListener('click', function(){ document.getElementById('badgeDetail').textContent = b.detail; });
+    badgesEl.appendChild(btn);
+  });
+
+  var stepData = [
+    { id:'greet', num:1, name:'Greet', status:'done', statusText:'Done', copy:'Meeting you, confirming the issue, and walking through what today’s visit will cover.' },
+    { id:'look', num:2, name:'Look', status:'done', statusText:'Done', copy:'A visual walkthrough of the system or area in question to spot anything obvious before deeper diagnostics.' },
+    { id:'eval', num:3, name:'Thorough eval', status:'progress', statusText:'In progress', copy:'Full diagnostic check using professional tools to find the exact cause, not just the symptom.' },
+    { id:'options', num:4, name:'Options', status:'todo', statusText:'Tap to start', copy:'Walking you through what we found and your repair or replacement options, plainly, before any work begins.' },
+    { id:'complete', num:5, name:'Complete the job', status:'todo', statusText:'Tap to start', copy:'Doing the agreed-upon work to code, with before and after photos for your records.' },
+    { id:'happy', num:6, name:'Happy customer', status:'todo', statusText:'Tap to start', copy:'Final walkthrough, cleanup, and making sure everything works the way it should before we leave.' }
+  ];
+  var stepsEl = document.getElementById('steps');
+  var stepRows = {};
+
+  function updateStepStatus(stepId, status, text){
+    var rec = null;
+    for (var i = 0; i < stepData.length; i++) { if (stepData[i].id === stepId) rec = stepData[i]; }
+    if (!rec) return;
+    rec.status = status; rec.statusText = text;
+    var refs = stepRows[stepId];
+    if (!refs) return;
+    refs.dot.className = 'status-dot status-' + status;
+    refs.text.textContent = text;
+    refs.text.style.color = status === 'done' ? 'var(--green)' : status === 'progress' ? 'var(--gold)' : status === 'waiting' ? 'var(--amber)' : 'var(--muted)';
+    if (refs.doneBtn) refs.doneBtn.style.display = (status === 'done' || status === 'waiting') ? 'none' : '';
+  }
+
+  stepData.forEach(function(s, idx){
+    var row = document.createElement('div');
+    row.className = 'step';
+    row.innerHTML =
+      '<div class="step-row">' +
+        '<span class="step-name"><span class="status-dot status-' + s.status + '"></span>' + s.num + '. ' + s.name + '</span>' +
+        '<span class="status-text" style="color:' + (s.status==='done' ? 'var(--green)' : s.status==='progress' ? 'var(--gold)' : 'var(--muted)') + ';">' + s.statusText + '</span>' +
+      '</div>' +
+      '<div class="step-detail">' +
+        '<div>' + s.copy + '</div>' +
+        '<div class="stars" data-step="' + s.id + '">' +
+          [1,2,3,4,5].map(function(n){ return '<span class="star" data-n="' + n + '">★</span>'; }).join('') +
+        '</div>' +
+        '<div class="privacy-note">Private rating, never shown to the tech.</div>' +
+        '<textarea class="comment" placeholder="Anything you’d like our manager to know about this part of the visit?"></textarea>' +
+        '<button class="btn-outline mark-done-btn">Mark this step done</button>' +
+        (s.id === 'complete' ?
+          '<div class="reschedule-note">Sometimes parts need to be ordered and the repair needs to be booked for another date. If that happened today, tap the button below.</div>' +
+          '<button class="btn-outline reschedule-btn">Add new appointment date</button>' +
+          '<div class="reschedule-form" style="display:none;">' +
+            '<input type="datetime-local" class="reschedule-date">' +
+            '<button class="btn-gold reschedule-submit">Send to manager</button>' +
+          '</div>' +
+          '<div class="reschedule-confirm" style="display:none;"></div>'
+        : '') +
+      '</div>';
+
+    var doneBtn = row.querySelector('.mark-done-btn');
+    stepRows[s.id] = { dot: row.querySelector('.status-dot'), text: row.querySelector('.status-text'), doneBtn: doneBtn };
+    if (s.status === 'done') doneBtn.style.display = 'none';
+    doneBtn.addEventListener('click', function(ev){
+      ev.stopPropagation();
+      updateStepStatus(s.id, 'done', 'Done');
+      if (s.id === 'complete') {
+        var reBtnEl = row.querySelector('.reschedule-btn');
+        var reNoteEl = row.querySelector('.reschedule-note');
+        if (reBtnEl) reBtnEl.style.display = 'none';
+        if (reNoteEl) reNoteEl.style.display = 'none';
+      }
+      var next = stepData[idx + 1];
+      if (next && next.status !== 'done') {
+        updateStepStatus(next.id, 'progress', 'In progress');
+      }
+    });
+
+    if (s.id === 'complete') {
+      var reBtn = row.querySelector('.reschedule-btn');
+      var reForm = row.querySelector('.reschedule-form');
+      var reConfirm = row.querySelector('.reschedule-confirm');
+      var reDate = row.querySelector('.reschedule-date');
+      var reSubmit = row.querySelector('.reschedule-submit');
+      reBtn.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        reForm.style.display = 'block';
+        reBtn.style.display = 'none';
+      });
+      reSubmit.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        if (!reDate.value) { reDate.focus(); return; }
+        updateStepStatus('complete', 'waiting', 'Rescheduled — parts on order');
+        var payload = { tech: TECH_NAME, step: 'Complete the job', newDate: reDate.value, ts: Date.now() };
+        logReschedule(payload);
+        sendRescheduleEmail(payload);
+        reForm.style.display = 'none';
+        reConfirm.textContent = 'Sent to your manager — they will confirm the date with Jordan.';
+        reConfirm.style.display = 'block';
+      });
+    }
+
+    row.addEventListener('click', function(e){
+      if (e.target.closest('.step-detail')) return;
+      var wasOpen = row.classList.contains('open');
+      document.querySelectorAll('.step.open').forEach(function(o){ if (o !== row) o.classList.remove('open'); });
+      row.classList.toggle('open');
+      if (!wasOpen && !row.dataset.scored) {
+        row.dataset.scored = '1';
+        dispatch('step', 'Agenda: ' + s.name, 2);
+      }
+    });
+    var commentBox = row.querySelector('textarea.comment');
+    row.querySelectorAll('.star').forEach(function(star){
+      star.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        var n = parseInt(star.dataset.n, 10);
+        row.querySelectorAll('.star').forEach(function(st){ st.classList.toggle('filled', parseInt(st.dataset.n,10) <= n); });
+        var alerts = readAlerts();
+        alerts[s.id] = { step: s.name, rating: n, note: commentBox ? commentBox.value : '', ts: Date.now() };
+        writeAlerts(alerts);
+      });
+    });
+    if (commentBox) {
+      commentBox.addEventListener('input', function(){
+        var alerts = readAlerts();
+        if (alerts[s.id]) {
+          alerts[s.id].note = commentBox.value;
+          alerts[s.id].ts = Date.now();
+          writeAlerts(alerts);
+        }
+      });
+    }
+    stepsEl.appendChild(row);
+  });
+
+  var eduTopics = ['What we check and why','How to read your service report','Signs it’s time to repair vs. replace','What a maintenance plan covers'];
+  var eduGrid = document.getElementById('eduGrid');
+  eduTopics.forEach(function(topic){
+    var card = document.createElement('div');
+    card.className = 'edu-card';
+    card.innerHTML = '<div class="edu-play">▶</div><div>' + topic + '</div>';
+    card.addEventListener('click', function(){ dispatch('video', 'Watched: ' + topic, 3); });
+    eduGrid.appendChild(card);
+  });
+
+  document.getElementById('joinBtn').addEventListener('click', function(){
+    dispatch('membership', 'Membership joined', 20);
+  });
+
+  document.getElementById('saveContactBtn').addEventListener('click', function(){
+    dispatch('contact', 'Contact saved', 10);
+  });
+
+  var btnA = document.getElementById('btnStateA');
+  var btnB = document.getElementById('btnStateB');
+  btnA.addEventListener('click', function(){
+    document.getElementById('stateA').style.display = '';
+    document.getElementById('stateB').style.display = 'none';
+    btnA.classList.add('active'); btnB.classList.remove('active');
+  });
+  btnB.addEventListener('click', function(){
+    document.getElementById('stateA').style.display = 'none';
+    document.getElementById('stateB').style.display = '';
+    btnB.classList.add('active'); btnA.classList.remove('active');
+  });
+
+  document.getElementById('giftBtn').addEventListener('click', function(){
+    document.getElementById('giftPrompt').style.display = 'none';
+    document.getElementById('giftForm').style.display = 'block';
+  });
+  document.getElementById('giftSubmit').addEventListener('click', function(){
+    document.getElementById('giftForm').style.display = 'none';
+    var code = 'TRL-' + Math.floor(10000 + Math.random() * 89999);
+    document.getElementById('giftCode').textContent = code;
+    document.getElementById('giftConfirm').style.display = 'block';
+  });
+
+  document.getElementById('demoTrigger').addEventListener('click', function(){
+    dispatch('demo_ping', 'Said hello', 0);
+    showFlash('Sent to Game Board');
+  });
+
+  dispatch('card_open', 'Card tapped', 5);
+</script>
+</body>
+</html>

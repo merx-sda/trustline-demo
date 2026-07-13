@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Game Board — Trustline Home Services</title>
+<style>
+  :root{
+    --navy:#101b2d;
+    --page:#0a1420;
+    --cream:#f3ead9;
+    --cream-muted:#cfc6b3;
+    --muted:#8a8371;
+    --gold:#caa768;
+    --amber:#d98c4a;
+    --danger:#d9614f;
+    --border:rgba(243,234,217,0.12);
+    --border-soft:rgba(243,234,217,0.08);
+    --surface:rgba(243,234,217,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--page);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+  .wrap{max-width:720px;margin:0 auto;min-height:100vh;background:var(--navy);color:var(--cream);padding:20px;}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+  .brand{font-size:11px;color:var(--gold);letter-spacing:0.03em;}
+  .h1{font-family:Georgia,Cambria,"Times New Roman",serif;font-size:20px;}
+  .ranges{display:flex;gap:6px;}
+  .range-btn{background:var(--surface);color:var(--muted);border:0.5px solid var(--border);border-radius:6px;padding:6px 12px;font-size:11px;cursor:pointer;}
+  .range-btn.active{background:var(--gold);color:var(--navy);font-weight:600;border-color:var(--gold);}
+  .banner{display:none;align-items:center;justify-content:space-between;gap:10px;background:rgba(202,167,104,0.14);border:0.5px solid rgba(202,167,104,0.5);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-family:Georgia,Cambria,"Times New Roman",serif;font-size:15px;color:var(--gold);}
+  .banner.show{display:flex;}
+  .banner button{background:transparent;border:none;color:var(--gold);font-size:16px;cursor:pointer;font-family:inherit;}
+  .cols{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px;}
+  @media (max-width:560px){ .cols{grid-template-columns:1fr;} }
+  .label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;}
+  .row{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--surface);margin-bottom:6px;}
+  .rank{width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .rank.top{background:var(--gold);color:var(--navy);}
+  .rank.rest{background:rgba(243,234,217,0.15);color:var(--cream-muted);}
+  .av{width:32px;height:32px;border-radius:50%;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;background:rgba(243,234,217,0.1);color:var(--cream-muted);}
+  .av.live{background:rgba(202,167,104,0.2);color:var(--gold);}
+  .row-body{flex:1;min-width:0;}
+  .row-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:4px;}
+  .pts{color:var(--gold);}
+  .bar{height:6px;border-radius:3px;background:rgba(243,234,217,0.1);overflow:hidden;display:flex;}
+  .bar-gold{background:var(--gold);}
+  .bar-rest{background:rgba(243,234,217,0.2);}
+  .flag{background:rgba(216,140,74,0.18);color:var(--amber);font-size:9px;padding:2px 6px;border-radius:8px;margin-left:6px;}
+  .live-tag{background:rgba(202,167,104,0.18);color:var(--gold);font-size:9px;padding:2px 6px;border-radius:8px;margin-left:6px;}
+  .legend{display:flex;gap:14px;margin-top:10px;font-size:10px;color:var(--muted);}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px;}
+  .feed-item{display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:8px;}
+  .feed-item span:first-child{flex:1;color:var(--cream-muted);}
+  .kv{display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px;color:var(--cream-muted);}
+  .kv b{color:var(--cream);font-weight:400;}
+  .reset{margin-top:20px;text-align:center;}
+  .reset button{background:transparent;border:none;color:var(--muted);font-size:10px;text-decoration:underline;cursor:pointer;font-family:inherit;}
+  .danger-zone{border:0.5px solid rgba(217,97,79,0.5);background:rgba(217,97,79,0.08);border-radius:10px;padding:12px;margin-top:16px;}
+  .danger-title{font-size:11px;color:var(--danger);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;font-weight:600;}
+  .danger-item{padding:8px 0;border-top:0.5px solid rgba(217,97,79,0.25);}
+  .danger-item:first-child{border-top:none;}
+  .danger-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:3px;}
+  .danger-stars{color:var(--danger);font-size:11px;letter-spacing:1px;}
+  .danger-note{font-size:11px;color:var(--cream-muted);line-height:1.4;margin-top:3px;}
+  .danger-time{font-size:9.5px;color:var(--muted);}
+  .danger-empty{font-size:11px;color:var(--cream-muted);}
+  .shoutouts{border:0.5px solid rgba(202,167,104,0.4);background:rgba(202,167,104,0.06);border-radius:10px;padding:12px;margin-top:12px;}
+  .shoutouts-title{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;font-weight:600;}
+  .shoutout-item{padding:8px 0;border-top:0.5px solid rgba(202,167,104,0.2);}
+  .shoutout-item:first-child{border-top:none;}
+  .shoutout-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;margin-bottom:3px;}
+  .shoutout-stars{color:var(--gold);font-size:11px;letter-spacing:1px;}
+  .shoutout-note{font-size:11px;color:var(--cream-muted);line-height:1.4;margin-top:3px;}
+  .shoutout-empty{font-size:11px;color:var(--cream-muted);}
+  .reschedule-zone{border:0.5px solid rgba(216,140,74,0.5);background:rgba(216,140,74,0.08);border-radius:10px;padding:12px;margin-top:12px;}
+  .reschedule-title{font-size:11px;color:var(--amber);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;font-weight:600;}
+  .reschedule-item{padding:8px 0;border-top:0.5px solid rgba(216,140,74,0.25);}
+  .reschedule-item:first-child{border-top:none;}
+  .reschedule-top{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
+  .reschedule-date-text{color:var(--amber);font-size:11px;}
+  .reschedule-empty{font-size:11px;color:var(--cream-muted);}
+  .contest-box{border:0.5px solid var(--border);background:var(--surface);border-radius:10px;padding:12px;margin-top:16px;}
+  .contest-title{font-size:11px;color:var(--gold);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;font-weight:600;}
+  .contest-controls{display:flex;gap:6px;margin-bottom:8px;}
+  .contest-controls select{flex:1;min-width:0;background:var(--navy);color:var(--cream);border:0.5px solid var(--border);border-radius:6px;padding:5px 4px;font-size:10.5px;}
+  .contest-toggle{display:flex;gap:4px;margin-bottom:10px;}
+  .contest-basis-btn{background:transparent;color:var(--muted);border:0.5px solid var(--border);border-radius:6px;padding:4px 10px;font-size:10px;cursor:pointer;}
+  .contest-basis-btn.active{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:600;}
+  .contest-row{display:flex;justify-content:space-between;font-size:11.5px;padding:5px 0;border-top:0.5px solid var(--border-soft);}
+  .contest-row:first-child{border-top:none;}
+  .contest-clear{width:100%;margin-top:8px;background:transparent;border:none;color:var(--muted);font-size:10px;text-decoration:underline;cursor:pointer;font-family:inherit;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div>
+      <div class="brand">Trustline Home Services</div>
+      <div class="h1">Game Board</div>
+    </div>
+    <div class="ranges">
+      <button class="range-btn">Today</button>
+      <button class="range-btn active">This week</button>
+      <button class="range-btn">This month</button>
+    </div>
+  </div>
+
+  <div class="banner" id="banner">
+    <span>Welcome to the Game Board — your team's accountability tracker, live.</span>
+    <button id="bannerClose" aria-label="Dismiss">&times;</button>
+  </div>
+
+  <div class="cols">
+    <div>
+      <div class="label">This week's leaders</div>
+      <div id="leaderboard"></div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--gold);"></span>Conversions</span>
+        <span><span class="dot" style="background:rgba(243,234,217,0.2);"></span>Leading activity</span>
+      </div>
+
+      <div class="danger-zone">
+        <div class="danger-title">Danger zone — 3 stars or below</div>
+        <div id="dangerList"></div>
+      </div>
+
+      <div class="shoutouts">
+        <div class="shoutouts-title">Shoutouts — 4-5 stars with a note</div>
+        <div id="shoutoutList"></div>
+      </div>
+
+      <div class="reschedule-zone">
+        <div class="reschedule-title">Rescheduled visits</div>
+        <div id="rescheduleList"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="label">Live activity</div>
+      <div id="feed"></div>
+      <div class="label" style="margin-top:16px;">Point values</div>
+      <div class="kv"><span>Card tapped or opened</span><b>5</b></div>
+      <div class="kv"><span>Agenda step tapped</span><b>2</b></div>
+      <div class="kv"><span>Education video watched</span><b>3</b></div>
+      <div class="kv"><span>Step rated 4-5 stars</span><b>3</b></div>
+      <div class="kv"><span>Contact saved</span><b>10</b></div>
+      <div class="kv"><span>Referral submitted</span><b>10</b></div>
+      <div class="kv"><span>Google review</span><b>15</b></div>
+      <div class="kv" style="color:var(--gold);"><span>Membership signed</span><b style="color:var(--gold);">20</b></div>
+
+      <div class="contest-box">
+        <div class="contest-title">Team contest</div>
+        <div class="contest-controls">
+          <select id="contestKpi">
+            <option value="membership">Membership signed</option>
+            <option value="referral">Referral submitted</option>
+            <option value="review">Google review</option>
+            <option value="contact">Contact saved</option>
+          </select>
+          <select id="contestRange">
+            <option value="today">Today</option>
+            <option value="week" selected>This week</option>
+            <option value="month">This month</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <div class="contest-toggle">
+          <button class="contest-basis-btn active" data-basis="points">Points</button>
+          <button class="contest-basis-btn" data-basis="count">Count</button>
+        </div>
+        <div id="contestList"></div>
+        <button class="contest-clear" id="contestClear">Clear contest</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="reset"><button id="resetBtn">Reset demo</button></div>
+</div>
+
+<script>
+  var EVENTS_KEY = 'tl_events';
+  var ALERTS_KEY = 'tl_alerts';
+  var RESCHEDULE_KEY = 'tl_reschedules';
+
+  function readReschedules(){
+    try { return JSON.parse(localStorage.getItem(RESCHEDULE_KEY) || '[]'); } catch(e){ return []; }
+  }
+
+  function formatDate(v){
+    var d = new Date(v);
+    if (isNaN(d.getTime())) return v;
+    return d.toLocaleString(undefined, { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+  }
+
+  function toLocalInputValue(d){
+    var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+  var seedReschedule = { tech:'Casey Brooks', step:'Complete the job', newDate: toLocalInputValue(new Date(Date.now() + 3*24*60*60*1000)), ts: Date.now() - 50*60000 };
+
+  var seedAlert = { tech:'Tommy Diaz', step:'Options', rating:2, note:'Customer felt rushed through pricing options.', ts: Date.now() - 35*60000 };
+  var seedShoutout = { tech:'Morgan Ellis', step:'Complete the job', rating:5, note:'Customer said this was the most professional visit they\'ve ever had.', ts: Date.now() - 20*60000 };
+  var RATING_POINTS = 3;
+
+  function readAlerts(){
+    try { return JSON.parse(localStorage.getItem(ALERTS_KEY) || '{}'); } catch(e){ return {}; }
+  }
+
+  function timeAgo(ts){
+    var s = Math.floor((Date.now() - ts) / 1000);
+    if (s < 60) return 'just now';
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + 'm ago';
+    var h = Math.floor(m / 60);
+    return h + 'h ago';
+  }
+
+  function starString(n){
+    var full = '★★★★★'.slice(0, n);
+    var empty = '☆☆☆☆☆'.slice(0, 5 - n);
+    return full + empty;
+  }
+
+  var seedFeed = [
+    { tech:'Morgan Ellis', label:'Video watched', points:3 },
+    { tech:'Casey Brooks', label:'Google review', points:15 },
+    { tech:'Tommy Diaz', label:'Card tapped', points:5 }
+  ];
+  var seedTechs = [
+    { name:'Morgan Ellis', initials:'ME', total:310, goldPct:50 },
+    { name:'Casey Brooks', initials:'CB', total:240, goldPct:35 },
+    { name:'Tommy Diaz', initials:'TD', total:85, goldPct:10, flag:true }
+  ];
+
+  var KPI_META = {
+    membership: { label:'Membership signed', points:20, eventType:'membership' },
+    referral: { label:'Referral submitted', points:10, eventType:'referral' },
+    review: { label:'Google review', points:15, eventType:null },
+    contact: { label:'Contact saved', points:10, eventType:'contact' }
+  };
+  var seedKpiData = {
+    'Morgan Ellis': { membership:3, referral:2, review:4, contact:5 },
+    'Casey Brooks': { membership:1, referral:3, review:2, contact:3 },
+    'Tommy Diaz': { membership:0, referral:1, review:1, contact:1 }
+  };
+  var RANGE_MULT = { today:0.2, week:1, month:4, all:6 };
+  var contestBasis = 'points';
+
+  function rangeCutoff(range){
+    var now = Date.now();
+    if (range === 'today') { var d = new Date(); d.setHours(0,0,0,0); return d.getTime(); }
+    if (range === 'week') return now - 7*24*60*60*1000;
+    if (range === 'month') return now - 30*24*60*60*1000;
+    return 0;
+  }
+
+  function renderContest(events){
+    var kpiKey = document.getElementById('contestKpi').value;
+    var range = document.getElementById('contestRange').value;
+    var meta = KPI_META[kpiKey];
+    var cutoff = rangeCutoff(range);
+    var mult = RANGE_MULT[range];
+
+    var jordanCount = 0, jordanPoints = 0;
+    if (meta.eventType) {
+      events.forEach(function(e){
+        if (e.type === meta.eventType && e.ts >= cutoff) { jordanCount++; jordanPoints += e.points; }
+      });
+    }
+
+    var rows = [{ name:'Jordan Reyes', count:jordanCount, points:jordanPoints, live:true }];
+    Object.keys(seedKpiData).forEach(function(name){
+      var c = Math.round(seedKpiData[name][kpiKey] * mult);
+      rows.push({ name:name, count:c, points:c * meta.points, live:false });
+    });
+    rows.sort(function(a,b){ return contestBasis === 'count' ? b.count - a.count : b.points - a.points; });
+
+    var listEl = document.getElementById('contestList');
+    listEl.innerHTML = '';
+    rows.forEach(function(r, i){
+      var val = contestBasis === 'count' ? r.count : r.points + ' pts';
+      var item = document.createElement('div');
+      item.className = 'contest-row';
+      item.innerHTML = '<span>' + (i+1) + '. ' + r.name + (r.live ? ' <span class="live-tag">Live</span>' : '') + '</span><span class="pts">' + val + '</span>';
+      listEl.appendChild(item);
+    });
+  }
+
+  function readEvents(){
+    try { return JSON.parse(localStorage.getItem(EVENTS_KEY) || '[]'); } catch(e){ return []; }
+  }
+
+  function computeJordan(events, alerts){
+    var leading = 0, conversion = 0, lastPing = null;
+    events.forEach(function(e){
+      if (e.type === 'demo_ping') { if (!lastPing || e.ts > lastPing.ts) lastPing = e; return; }
+      if (e.type === 'card_open' || e.type === 'step' || e.type === 'video') leading += e.points;
+      if (e.type === 'contact' || e.type === 'membership') conversion += e.points;
+    });
+    Object.keys(alerts).forEach(function(k){
+      if (alerts[k].rating >= 4) conversion += RATING_POINTS;
+    });
+    var total = leading + conversion;
+    var goldPct = total > 0 ? Math.round((conversion / total) * 100) : 0;
+    return { name:'Jordan Reyes', initials:'JR', total:total, goldPct:goldPct, live:true, lastPing:lastPing };
+  }
+
+  function render(){
+    var events = readEvents();
+    var liveAlerts = readAlerts();
+    var jordan = computeJordan(events, liveAlerts);
+
+    var banner = document.getElementById('banner');
+    if (jordan.lastPing && jordan.lastPing.ts > (window._lastSeenPing || 0)) {
+      banner.classList.add('show');
+    } else {
+      banner.classList.remove('show');
+    }
+
+    var all = seedTechs.concat([jordan]).sort(function(a,b){ return b.total - a.total; });
+    var board = document.getElementById('leaderboard');
+    board.innerHTML = '';
+    all.forEach(function(t, i){
+      var row = document.createElement('div');
+      row.className = 'row';
+      row.innerHTML =
+        '<div class="rank ' + (i === 0 ? 'top' : 'rest') + '">' + (i+1) + '</div>' +
+        '<div class="av' + (t.live ? ' live' : '') + '">' + t.initials + '</div>' +
+        '<div class="row-body">' +
+          '<div class="row-top"><span>' + t.name + (t.flag ? '<span class="flag">Low conversion</span>' : '') + (t.live ? '<span class="live-tag">Live</span>' : '') + '</span><span class="pts">' + t.total + ' pts</span></div>' +
+          '<div class="bar"><div class="bar-gold" style="width:' + t.goldPct + '%;"></div><div class="bar-rest" style="width:' + (100 - t.goldPct) + '%;"></div></div>' +
+        '</div>';
+      board.appendChild(row);
+    });
+
+    var allRated = Object.keys(liveAlerts).map(function(k){
+      var a = liveAlerts[k];
+      return { tech:'Jordan Reyes', step:a.step, rating:a.rating, note:a.note || '', ts:a.ts };
+    });
+
+    var alertList = allRated.filter(function(a){ return a.rating <= 3; }).concat([seedAlert]).sort(function(a,b){ return b.ts - a.ts; });
+    var dangerEl = document.getElementById('dangerList');
+    dangerEl.innerHTML = '';
+    if (alertList.length === 0) {
+      dangerEl.innerHTML = '<div class="danger-empty">No flags right now.</div>';
+    } else {
+      alertList.forEach(function(a){
+        var item = document.createElement('div');
+        item.className = 'danger-item';
+        item.innerHTML =
+          '<div class="danger-top"><span>' + a.tech + ' — ' + a.step + '</span><span class="danger-stars">' + starString(a.rating) + '</span></div>' +
+          '<div class="danger-note">' + (a.note ? a.note : 'No note left.') + '</div>' +
+          '<div class="danger-time">' + timeAgo(a.ts) + '</div>';
+        dangerEl.appendChild(item);
+      });
+    }
+
+    var shoutoutList = allRated.filter(function(a){ return a.rating >= 4 && a.note.trim() !== ''; }).concat([seedShoutout]).sort(function(a,b){ return b.ts - a.ts; });
+    var shoutoutEl = document.getElementById('shoutoutList');
+    shoutoutEl.innerHTML = '';
+    if (shoutoutList.length === 0) {
+      shoutoutEl.innerHTML = '<div class="shoutout-empty">No shoutouts yet.</div>';
+    } else {
+      shoutoutList.forEach(function(a){
+        var item = document.createElement('div');
+        item.className = 'shoutout-item';
+        item.innerHTML =
+          '<div class="shoutout-top"><span>' + a.tech + ' — ' + a.step + '</span><span class="shoutout-stars">' + starString(a.rating) + '</span></div>' +
+          '<div class="shoutout-note">' + a.note + '</div>' +
+          '<div class="danger-time">' + timeAgo(a.ts) + '</div>';
+        shoutoutEl.appendChild(item);
+      });
+    }
+
+    var liveFeed = events.filter(function(e){ return e.type !== 'demo_ping'; }).slice(-6).reverse();
+    var combined = liveFeed.map(function(e){ return { tech:e.tech, label:e.label, points:e.points }; }).concat(seedFeed).slice(0, 6);
+    var feedEl = document.getElementById('feed');
+    feedEl.innerHTML = '';
+    combined.forEach(function(f){
+      var item = document.createElement('div');
+      item.className = 'feed-item';
+      item.innerHTML = '<span>' + f.tech + ' — ' + f.label + '</span><span class="pts">+' + f.points + '</span>';
+      feedEl.appendChild(item);
+    });
+
+    var rescheduleList = readReschedules().concat([seedReschedule]).sort(function(a,b){ return b.ts - a.ts; });
+    var reEl = document.getElementById('rescheduleList');
+    reEl.innerHTML = '';
+    if (rescheduleList.length === 0) {
+      reEl.innerHTML = '<div class="reschedule-empty">No reschedules right now.</div>';
+    } else {
+      rescheduleList.forEach(function(r){
+        var item = document.createElement('div');
+        item.className = 'reschedule-item';
+        item.innerHTML =
+          '<div class="reschedule-top"><span>' + r.tech + ' — ' + r.step + '</span></div>' +
+          '<div class="reschedule-date-text">New date: ' + formatDate(r.newDate) + '</div>' +
+          '<div class="danger-time">' + timeAgo(r.ts) + '</div>';
+        reEl.appendChild(item);
+      });
+    }
+
+    renderContest(events);
+  }
+
+  document.getElementById('bannerClose').addEventListener('click', function(){
+    var events = readEvents();
+    var last = events.filter(function(e){ return e.type === 'demo_ping'; }).pop();
+    window._lastSeenPing = last ? last.ts : Date.now();
+    document.getElementById('banner').classList.remove('show');
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    localStorage.removeItem(EVENTS_KEY);
+    localStorage.removeItem(ALERTS_KEY);
+    localStorage.removeItem(RESCHEDULE_KEY);
+    window._lastSeenPing = 0;
+    render();
+  });
+
+  document.querySelectorAll('.range-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      document.querySelectorAll('.range-btn').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+    });
+  });
+
+  document.getElementById('contestKpi').addEventListener('change', render);
+  document.getElementById('contestRange').addEventListener('change', render);
+  document.querySelectorAll('.contest-basis-btn').forEach(function(b){
+    b.addEventListener('click', function(){
+      contestBasis = b.dataset.basis;
+      document.querySelectorAll('.contest-basis-btn').forEach(function(x){ x.classList.remove('active'); });
+      b.classList.add('active');
+      render();
+    });
+  });
+  document.getElementById('contestClear').addEventListener('click', function(){
+    document.getElementById('contestKpi').value = 'membership';
+    document.getElementById('contestRange').value = 'week';
+    contestBasis = 'points';
+    document.querySelectorAll('.contest-basis-btn').forEach(function(x, i){ x.classList.toggle('active', i === 0); });
+    render();
+  });
+
+  window.addEventListener('storage', function(e){ if (e.key === EVENTS_KEY || e.key === ALERTS_KEY || e.key === RESCHEDULE_KEY) render(); });
+  document.addEventListener('visibilitychange', function(){ if (!document.hidden) render(); });
+  setInterval(render, 1500);
+  render();
+</script>
+</body>
+</html>
